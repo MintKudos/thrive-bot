@@ -1,5 +1,7 @@
 # Thrive Bot
 
+WARNING: This project is in early development and is not yet ready for production use. BETA releae is coming soon.
+
 This is the source code to Thrive Bot: a helpful bot for any community. Thrive is written in TypeScript and runs with Node.js or the Bun runtime.
 
 To use the latest version of the bot for testing, add Thrive Bot to your Discord server: 
