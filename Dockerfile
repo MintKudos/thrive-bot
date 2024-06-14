@@ -21,7 +21,8 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3
 
 # Install node modules
-COPY --link bun.lockb package.json yarn.lock ./
+# COPY --link bun.lockb package.json yarn.lock ./
+COPY --link bun.lockb package.json ./
 RUN bun install --frozen-lockfile --ci
 
 # Copy application code
@@ -32,8 +33,8 @@ COPY --link . .
 FROM base
 
 # Install packages needed for deployment
+# apt-get install --no-install-recommends -y ffmpeg && \
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y ffmpeg && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Copy built application
