@@ -5,6 +5,8 @@ This is the source code to Thrive Bot: a helpful bot for any community. Thrive i
 To use the latest version of the bot for testing, add Thrive Bot to your Discord server: 
 [https://discord.com/oauth2/authorize?client_id=1220895933563277332](https://discord.com/oauth2/authorize?client_id=1220895933563277332).
 
+Learn more about us at https://ThriveTogether.ai
+
 ## Features
 
 - Seamless integration with Discord
