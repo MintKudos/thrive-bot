@@ -124,6 +124,7 @@ export function addHistory(msg: UserChannelData) {
     }
   }
 
+  msg.react("🤔");
   history.set(key, msg);
   throttleResponse(0);
 }
@@ -264,6 +265,8 @@ async function gptcompletionOnHistory() {
         isAdmin,
         isTelegram ? 1 : 0
       );
+
+      val.react("");
       // console.log("userText::r", r, saved, fetched);
 
       // bot reactions
@@ -282,11 +285,9 @@ async function gptcompletionOnHistory() {
         val.react("❓");
       }
       if (r.includes("SILENCE") || r.includes("STOP")) {
-        val.react("");
         console.log('x Silence or stop command detected: "', r);
         return;
       } else {
-        val.react("");
       }
 
       // if (saved) return; // don't log saved messages]
@@ -364,16 +365,6 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
   ) {
     isAdmin = true;
   }
-
-  // Check for trigging words to activate AI
-
-  // if (content.split(" ").length < 2) {
-  //   console.log("Message too short");
-  //   return;
-  // }
-
-  // thinking face
-  message.react("🤔");
 
   addHistory({
     react: (msg: string) => {
