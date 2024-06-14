@@ -537,7 +537,7 @@ export async function copilot(
           parse: JSON.parse,
           name: "save_or_update_or_order",
           description:
-            "Save new information or remove. Ensure user provides minimumal coherent complete information [example: cup size must be specified for coffee orders]. Must explicit ask to save, update, or delete info. Ignore for questions, only for information-giving statements.",
+            "Save new information or remove. Ensure user provides minimumal coherent information [example: if report is 'its broken', ask 'what is broken?']. Must explicit ask to save, update, or delete info. Ignore for questions, only for information-giving statements.",
           parameters: {
             type: "object",
             properties: {

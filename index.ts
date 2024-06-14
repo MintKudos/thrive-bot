@@ -43,6 +43,12 @@ export function addHistory(msg: UserChannelData) {
     return true;
   }
 
+  const everyWordNotMatching = checkMatchingWords(userText);
+  if (!everyWordNotMatching) {
+    console.log("No AI trigger words found in message");
+    return;
+  }
+
   // ignore idle or met chat
   if (
     /^(\/\/|#|\^|@|meta|note|hm|hrm|!|\?)/.test(userText) ||
@@ -240,6 +246,10 @@ async function gptcompletionOnHistory() {
   for (const [__channelid, val] of historyClone.entries()) {
     const channelid = val.channel;
     const { userText, userId, isAdmin, messageId, reply, isTelegram } = val;
+    if (!userText) {
+      console.log("No userText found in history", val);
+      return;
+    }
     // const channel = (await client.channels.fetch(channelid)) as TextChannel;
 
     try {
@@ -355,14 +365,7 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
     isAdmin = true;
   }
 
-  let roomLog: string = "";
-
   // Check for trigging words to activate AI
-  const everyWordNotMatching = checkMatchingWords(content);
-  if (!everyWordNotMatching) {
-    console.log("No AI trigger words found in message");
-    return;
-  }
 
   // if (content.split(" ").length < 2) {
   //   console.log("Message too short");
@@ -378,7 +381,7 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
       if (msg) message.react(msg);
     },
     isAdmin: isAdmin,
-    userText: roomLog,
+    userText: c, // message.content,
     channel: channelId,
     messageId: message.id,
     reply: async (msg: string) => {
