@@ -17,10 +17,14 @@ Learn more about us at https://ThriveTogether.ai
 
 ## Requirements
 
-To run Thrive Bot, you need to set the following environment variables in a `.env` file:
+To run Thrive Bot, you need to set the following environment variables in a .env file:
 
-- `DISCORD_TOKEN`: Your Discord bot token for accessing the Discord API.
-- `PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key for PostgreSQL hosting.
+DISCORD_TOKEN=your_discord_token
+PUBLIC_SUPABASE_ANON_KEY=your_public_supabase_anon_key
+DISCORD_APP_ID=your_discord_app_id
+OPENAI_API_KEY=your_openai_api_key
+SUPABASE_HOST=your_supabase_host
+SUPABASE_SERVICE_ROLL=your_supabase_service_roll
 
 ## Installation
 
