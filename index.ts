@@ -43,12 +43,6 @@ export function addHistory(msg: UserChannelData) {
     return true;
   }
 
-  const everyWordNotMatching = checkMatchingWords(userText);
-  if (!everyWordNotMatching) {
-    console.log("No AI trigger words found in message");
-    return;
-  }
-
   // ignore idle or met chat
   if (
     /^(\/\/|#|\^|@|meta|note|hm|hrm|!|\?)/.test(userText) ||
@@ -61,7 +55,7 @@ export function addHistory(msg: UserChannelData) {
 
   if (c.startsWith("/help")) {
     reply(
-      "Commands: \n /reset_all - to reset all your data \n /recent - show recent rows \n /help - to view this message"
+      "Commands: \n /requests shows all open user requests\n /profile shows user profile\n /reset_all - to reset all your data \n /recent - show recent rows \n /help - to view this message"
     );
     return true;
   }
@@ -124,6 +118,13 @@ export function addHistory(msg: UserChannelData) {
     }
   }
 
+  const everyWordNotMatching = checkMatchingWords(msg.userText);
+  if (!everyWordNotMatching) {
+    console.log("No AI trigger words found in message");
+    return;
+  }
+
+  console.log("msg", msg);
   msg.react("🤔");
   history.set(key, msg);
   throttleResponse(0);
