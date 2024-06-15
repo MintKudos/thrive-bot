@@ -384,11 +384,8 @@ async function get_event_fact(args: {
   let searchTerm = `${args.searchTerm} #${args.category}`;
 
   // add my own userid if not already included/targeted
-  if (
-    OPEN_PUBLIC_SAVE_CATEGORIES.includes(args.category) &&
-    !searchTerm.includes("#userid_") &&
-    args.targetUserId
-  )
+  const isUserReported = OPEN_PUBLIC_SAVE_CATEGORIES.includes(args.category);
+  if (isUserReported && !searchTerm.includes("#userid_") && args.targetUserId)
     searchTerm += ` #userid_${args.targetUserId}`;
 
   // add alt category if needed
@@ -413,10 +410,11 @@ async function get_event_fact(args: {
         `<MAYBE_SEARCH_RESULT>\n BY: #userid_${x.userid}\n CATEGORY: ${x.category}\n ${x.content}\n`
     );
 
-  const resp = `Tell #userid_${
-    args.userid
-  } that their request returned results:\n${query?.join("\n")}`;
-
+  let resp = `Context search results:\n${query?.join("\n")}`;
+  if (isUserReported) {
+    resp =
+      "Always refer to creator #userid_ for referring to user data. \n" + resp;
+  }
   console.log(`::get_event_fact (${args.category})`, resp || []); //  '${searchTerm}'
 
   if (!query || query?.length === 0) {
