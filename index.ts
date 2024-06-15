@@ -294,8 +294,9 @@ async function gptcompletionOnHistory() {
 
       if (!userText.includes("?") && saved) {
         val.react("👍");
-        console.log("fetched or saved");
-        return;
+        //console.log("fetched or saved");
+
+        // if(isAdmin) return; // don't bother replying if admin
       }
       // channel.send(r);
       // Message post reply to the user messageId

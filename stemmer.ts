@@ -46,6 +46,7 @@ export function checkMatchingWords(userText: string) {
 // export const stemmer = natural.PorterStemmer;
 // // To limit the AI running all the time, look for info requests or commands
 export const keyTriggerAIWords = [
+  "report",
   "list",
   "search",
   "have",

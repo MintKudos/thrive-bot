@@ -533,9 +533,9 @@ export async function copilot(
             }
           },
           parse: JSON.parse,
-          name: "save_or_update_or_order",
+          name: "save_update_report",
           description:
-            "Save new information or remove. Ensure user provides minimumal coherent information [example: if report is 'its broken', ask 'what is broken?']. Must explicit ask to save, update, or delete info. Ignore for questions, only for information-giving statements.",
+            "Save new reported information or remove. Ensure user provides minimumal coherent information [example: if report is 'its broken', ask 'what is broken?']. Must explicit ask to save, update, or delete info. Ignore for questions, only for information-giving statements.",
           parameters: {
             type: "object",
             properties: {
@@ -650,7 +650,7 @@ export async function copilot(
           parse: JSON.parse,
           name: "spam_or_abuse_detection",
           description:
-            "Gets called if the request is spam or abuse. Respond with a warning or report to admins.",
+            "ONLY called if the request is obviously spam or bot input abuse. Respond with a warning or report to admins.",
           parameters: {
             type: "object",
             properties: {
