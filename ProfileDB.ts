@@ -200,10 +200,10 @@ export async function getDoc(args: { searchTerm: string; channelid: string }) {
   //   updated_at: d.updated_at,
   // }));
 
-  console.log(
-    "::query raw result \n",
-    data.map((x: any) => `rid_${x.id}: ${x.content}`).join("\n\n")
-  );
+  // console.log(
+  //   "::query raw result \n",
+  //   data.map((x: any) => `rid_${x.id}: ${x.content}`).join("\n\n")
+  // );
 
   return data ? data : [];
 }

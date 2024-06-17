@@ -74,6 +74,11 @@ export function addHistory(msg: UserChannelData) {
     // return false;
   }
 
+  if (c.startsWith("/todo") || c.startsWith("/task")) {
+    c = msg.userText = "show me all todo tasks";
+    // return false;
+  }
+
   if (c.startsWith("/reset_all")) {
     db.from("documents")
       .delete()
@@ -329,8 +334,8 @@ async function replaceUserMentions(r: string) {
 
 function handleDiscordIncomingMessage(message: Message<boolean>) {
   // console.log("handleIncomingMessage", message.content);
-  let content = message.content;
-  let c = content.replace(/$<@.*>\s*/, "");
+  // let content = message.content;
+  let c = message.content.replace(/$<@.*>\s*/, "");
 
   // console.log("c", c);
 
@@ -338,9 +343,10 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
   const channelId = message.channel.id;
 
   // check if message @mentions a username and add that user's ID to the message
+
   if (message.attachments?.first()?.url) {
-    const allowedExtensions = /\.(png|jpg|jpeg|gif|mp4|webm|webp|txt|md|pdf)$/i;
-    content = `${content} \n${message.attachments
+    const allowedExtensions = /\.(png|jpg|jpeg|gif|mp4|webm|webp|txt|md|pdf)/i;
+    c = `${c} \n<attachments>\n${message.attachments
       .filter((x) => allowedExtensions.test(x.url))
       .map((a) => a.url)
       .join(" \n")}`;
@@ -348,14 +354,14 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
 
   // console.log("content after mentions", content);
   // return;
-  Sentry.setExtra("msg", content);
+  Sentry.setExtra("msg", c);
 
   // check for mentions like <@1220895933563277332> and convert into #userid_1220895933563277332
   const mentionRegex = /<@[!]*(\d+)>/g; // <@!1220895933563277332>
   const mentions = Array.from(c.matchAll(mentionRegex)); // use where we remove self mention
   for (const m of mentions) {
     const userId = m[1];
-    content = content.replace(m[0], `#userid_${userId}`);
+    c = c.replace(m[0], `#userid_${userId}`);
   }
 
   // check if message is a guild administrator or can kick members
@@ -374,7 +380,7 @@ function handleDiscordIncomingMessage(message: Message<boolean>) {
       if (msg) message.react(msg);
     },
     isAdmin: isAdmin,
-    userText: c, // message.content,
+    userText: c,
     channel: channelId,
     messageId: message.id,
     reply: async (msg: string) => {

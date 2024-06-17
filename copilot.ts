@@ -17,6 +17,7 @@ import {
 
 import openai from "openai";
 import type { ChatCompletionToolRunnerParams } from "openai/lib/ChatCompletionRunner.mjs";
+import { get_event_fact } from "./get_event_fact.ts";
 
 // export const groqClient = new Groq({
 //   apiKey: process.env["GROQ_API_KEY"],
@@ -50,8 +51,6 @@ export const OPEN_PUBLIC_SAVE_CATEGORIES = [
   "buying_item_request",
   "example_tutorial",
   "feature_request_or_issue",
-  // "user_feature_request",
-  // "issues",
 ];
 
 const openaiConfig = {
@@ -129,7 +128,7 @@ async function update_community_program_fact(args: {
 
   console.log(
     `:found ${doc?.length || 0} existing docs to check if needed update`,
-    doc
+    doc.map((x) => x.id + ": " + x.content)
   );
 
   let updates = 0,
@@ -254,28 +253,28 @@ async function update_community_program_fact(args: {
           parse: JSON.parse,
           name: "no_updates_needed",
           description:
-            "Call when existing content is already up to date and no updates, deletes, or new rows are needed.",
+            "Call when existing DB content is already up to date or no changes or deletes needed. No inserts, updates, deletes, or new rows are needed.",
           parameters: {},
           required: [],
         },
       },
 
-      // {
-      //   type: "function",
-      //   function: {
-      //     function: (): string => {
-      //       console.log(":force_new_entry", args);
-      //       forcenew = true;
-      //       return "okay";
-      //     },
-      //     parse: JSON.parse,
-      //     name: "must_create_new_entry",
-      //     description:
-      //       "Called when its better to insert than update search results.",
-      //     parameters: {},
-      //     required: [],
-      //   },
-      // },
+      {
+        type: "function",
+        function: {
+          function: (): string => {
+            console.log(":no_match_and_create_new_entry", args);
+            forcenew = true;
+            return "okay";
+          },
+          parse: JSON.parse,
+          name: "no_match_and_create_new_entry",
+          description:
+            "Called when its better to insert a new record than update search results.",
+          parameters: {},
+          required: [],
+        },
+      },
     ],
 
     //  or respond with the word STOP if no updates needed
@@ -294,7 +293,7 @@ async function update_community_program_fact(args: {
       },
     ],
     model: "gpt-4o", // "llama3-70b-8192",
-    parallel_tool_calls: true,
+    parallel_tool_calls: false,
     temperature: 0.4,
     // temperature: 0.6,
   });
@@ -369,60 +368,6 @@ const save_or_update_community_fact = async (args: {
   return await saveDoc(params);
 };
 
-async function get_event_fact(args: {
-  searchTerm: string;
-  channelid: string;
-  userid: string;
-  category: string;
-  targetUserId: string;
-  category_alt: string;
-}) {
-  // args.targetUserId = args.targetUserId || args.userid;
-  // if user is the bot, assume global?
-  if (args.targetUserId === "1220895933563277332") args.targetUserId = "";
-
-  let searchTerm = `${args.searchTerm} #${args.category}`;
-
-  // add my own userid if not already included/targeted
-  const isUserReported = OPEN_PUBLIC_SAVE_CATEGORIES.includes(args.category);
-  if (isUserReported && !searchTerm.includes("#userid_") && args.targetUserId)
-    searchTerm += ` #userid_${args.targetUserId}`;
-
-  // add alt category if needed
-  // if (args.category_alt && args.category_alt !== args.category)
-  //   searchTerm += ` #${args.category_alt}`;
-
-  const query = (
-    await getDoc({
-      searchTerm: searchTerm,
-      channelid: args.channelid,
-    })
-  )
-    // console log each row
-    ?.filter(
-      (x) =>
-        args.category === x.category || args.category_alt?.includes(x.category)
-    )
-    // filter rows not matching target user
-    .filter((x) => !args.targetUserId || x.userid === args.targetUserId)
-    ?.map(
-      (x, index) =>
-        `<MAYBE_SEARCH_RESULT>\n BY: #userid_${x.userid}\n CATEGORY: ${x.category}\n ${x.content}\n`
-    );
-
-  let resp = `Context search results:\n${query?.join("\n")}`;
-  if (isUserReported) {
-    resp =
-      "Always refer to creator #userid_ for referring to user data. \n" + resp;
-  }
-  console.log(`::get_event_fact (${args.category})`, resp || []); //  '${searchTerm}'
-
-  if (!query || query?.length === 0) {
-    return "No information found on question - respond with the word <NOT_FOUND>";
-  }
-
-  return resp;
-}
 async function matchmaker(args: { topics: string }, r: any) {
   console.log("matchmaker", args);
   const topics = args.topics;

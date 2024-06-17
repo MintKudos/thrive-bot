@@ -22,7 +22,7 @@
   "dependencies": {
     "@sentry/bun": "^8.9.2",
     "@supabase/sentry-js-integration": "^0.2.0",
-    "@supabase/supabase-js": "^2.43.4",
+    "@supabase/supabase-js": "^2.43.5",
     "@types/node-telegram-bot-api": "^0.64.6",
     "@types/pg": "^8.11.6",
     "@types/throttle-debounce": "^5.0.2",
