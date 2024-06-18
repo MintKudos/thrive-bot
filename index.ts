@@ -23,6 +23,7 @@ import { initTg } from "./telegram.ts";
 // Stateful data for each user and interfaces
 type ChannelIdKey = string;
 type ChannelUserIdKey = string;
+type UserIdKey = string;
 
 export interface UserChannelData {
   userId: UserIdKey;
@@ -48,7 +49,7 @@ export function addHistory(msg: UserChannelData) {
   if (!limiter) {
     limiterGlobal.set(
       msg.channel,
-      (limiter = new RateLimiter({ tokensPerInterval: 60, interval: "hour" }))
+      (limiter = new RateLimiter({ tokensPerInterval: 80, interval: "hour" }))
     );
   } else if (!limiter.tryRemoveTokens(1)) {
     reply(
