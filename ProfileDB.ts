@@ -9,6 +9,20 @@ if (!supabaseUrl) throw new Error("no Superbase SUPABASE_HOST env key");
 if (!supabaseKey) throw new Error("no Superbase SUPABASE_SERVICE_ROLL env key");
 export const db = createClient<Database>(supabaseUrl, supabaseKey);
 
+export const dbchannel = db.channel("app", {
+  config: {
+    broadcast: { ack: true },
+  },
+});
+
+export function broadcastMessage(message: any) {
+  dbchannel.send({
+    type: "broadcast",
+    event: "adminbroadcast",
+    payload: { message },
+  });
+}
+
 // Profile APIs
 export async function getProfileById(id: string) {
   return await db.from("profiles").select("*").eq("userid", id);

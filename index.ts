@@ -15,7 +15,7 @@ import { copilot } from "./copilot.ts";
 import { throttle } from "throttle-debounce";
 
 import { checkMatchingWords, keyTriggerAIWords } from "./stemmer.ts";
-import { db } from "./ProfileDB.ts";
+import { broadcastMessage, db, dbchannel } from "./ProfileDB.ts";
 import { initTg } from "./telegram.ts";
 
 // Stateful data for each user and interfaces
@@ -77,6 +77,19 @@ export function addHistory(msg: UserChannelData) {
   if (c.startsWith("/todo") || c.startsWith("/task")) {
     c = msg.userText = "show me all todo tasks";
     // return false;
+  }
+
+  if (c.startsWith(process.env.SECRET_BROADCAST_CMD || "/adminbroadcast")) {
+    const msg = c.split(" ").slice(1).join(" ");
+
+    // push event to all users using supabase pg
+    // broadcastMessage("broadcast to all users");
+    client.channels.cache.forEach((channel) => {
+      if (channel.type === ChannelType.GuildText) {
+        (channel as TextChannel).send("SYSTEM MESSAGE: " + msg);
+      }
+    });
+    return false;
   }
 
   if (c.startsWith("/reset_all")) {
@@ -172,6 +185,12 @@ client.on("error", (e) => {
 
 client.on("ready", async () => {
   console.log("Bot is ready!");
+
+  // dbchannel
+  //   .on("broadcast", { event: "adminbroadcast" }, (payload) => {
+
+  // })
+  // .subscribe();
 
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) {
