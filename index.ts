@@ -10,6 +10,8 @@ import {
   BaseGuildTextChannel,
 } from "discord.js";
 
+import { RateLimiter } from "limiter";
+
 import "dotenv/config";
 import { copilot } from "./copilot.ts";
 import { throttle } from "throttle-debounce";
@@ -20,7 +22,7 @@ import { initTg } from "./telegram.ts";
 
 // Stateful data for each user and interfaces
 type ChannelIdKey = string;
-type UserIdKey = string;
+type ChannelUserIdKey = string;
 
 export interface UserChannelData {
   userId: UserIdKey;
@@ -34,9 +36,27 @@ export interface UserChannelData {
   isTelegram: boolean;
 }
 
-const history = new Map<ChannelIdKey, UserChannelData>();
+const limiterGlobal = new Map<ChannelIdKey, RateLimiter>();
+// new RateLimiter({ tokensPerInterval: 150, interval: "hour" });
+
+const history = new Map<ChannelUserIdKey, UserChannelData>();
 export function addHistory(msg: UserChannelData) {
   const { userText, userId, isAdmin, messageId, reply } = msg;
+
+  // Rate limiting
+  let limiter = limiterGlobal.get(msg.channel);
+  if (!limiter) {
+    limiterGlobal.set(
+      msg.channel,
+      (limiter = new RateLimiter({ tokensPerInterval: 60, interval: "hour" }))
+    );
+  } else if (!limiter.tryRemoveTokens(1)) {
+    reply(
+      "Rate limit exceeded. Please try again in an hour. Contact support@thrivetogether.ai for rate increase."
+    );
+    return;
+  }
+
   // If group chat, check if the bot was mentioned
   if (userText.length > 600) {
     reply("600 characters limit please for my brain. Thanks friend!");
