@@ -53,11 +53,11 @@ export const OPEN_PUBLIC_SAVE_CATEGORIES = [
   "feature_request_or_issue",
 ];
 
-const openaiConfig = {
-  apiKey: process.env.OPENAI_API_KEY, // process.env["GROQ_API_KEY"], // process.env.OPENAI_API_KEY,
-};
-
-export const openaiClient = new openai.OpenAI(openaiConfig);
+const MODEL = process.env.OPENAI_MODEL || "gpt-4o"; // "llama3"; // "gpt-4o";
+export const openaiClient = new openai.OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "ollama",
+  baseURL: process.env.OPENAI_HOST || undefined, // || "http://localhost:11434/v1",
+});
 
 function adminGuard<T>(isAdmin: boolean, fn: T) {
   return isAdmin
@@ -292,7 +292,7 @@ async function update_community_program_fact(args: {
         content: `<REQUEST_TO_SAVE>\n${fact} \n<EXISTING_DATABASE_ROWS>${docStr}`,
       },
     ],
-    model: "gpt-4o", // "llama3-70b-8192",
+    model: MODEL, // "llama3-70b-8192",
     parallel_tool_calls: false,
     temperature: 0.4,
     // temperature: 0.6,
@@ -521,7 +521,7 @@ export async function copilot(
               },
               admin: {
                 type: "boolean",
-                enum: [isAdmin],
+                enum: [isAdmin ? "T" : "F"],
                 description: "The user is an admin",
               },
             },
@@ -703,7 +703,7 @@ export async function copilot(
       },
     ],
     parallel_tool_calls: true,
-    model: "gpt-4o", // "llama3-70b-8192",
+    model: MODEL, // "llama3-70b-8192",
     temperature: 0.4,
     // temperature: 0.6,
   });
